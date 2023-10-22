@@ -9,18 +9,25 @@
             margin: 20px;
         }
 
-        .channel-link {
-            display: block;
+        .channel-button {
             font-size: 18px;
             margin: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <h1>App de Noticias para TV</h1>
     <p>Selecciona un canal de noticias:</p>
-    <a class="channel-link" href="https://www.youtube.com/channel/UC7QZIf0dta-XPXsp9Hv4dTw?sub_confirmation=1" target="_blank">24H de Televisión Española</a>
-    <a class="channel-link" href="https://www.youtube.com/user/euronewses" target="_blank">Euronews en Español</a>
-    <a class="channel-link" href="https://www.youtube.com/user/euronewses" target="_blank">France24 Español</a>
+    <button class="channel-button" onclick="openChannel('https://www.youtube.com/channel/UC7QZIf0dta-XPXsp9Hv4dTw?sub_confirmation=1')">24H de Televisión Española</button>
+    <button class="channel-button" onclick="openChannel('https://www.youtube.com/user/euronewses')">Euronews en Español</button>
+    <button class="channel-button" onclick="openChannel('https://www.youtube.com/user/euronewses')">France24 Español</button>
+
+    <script>
+        function openChannel(url) {
+            window.open(url, '_blank');
+        }
+    </script>
 </body>
 </html>
