@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>App de Noticias para TV</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,7 +35,6 @@
         .channel-logo {
             max-width: 50px;
         }
-
     </style>
 </head>
 <body>
@@ -47,53 +47,49 @@
     <div class="video-list" id="video-list"></div>
 
     <script>
-        // Función para almacenar tu clave de API de forma segura
-        function getAPIKey() {
-            return 'AIzaSyA2PYKH6vm6C8gh0o38oRKt5Sd-_ArWtxk';
-        }
-
         function showChannelVideos(apiKey, channelId) {
             const maxResults = 3;
 
-            fetch(`https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&order=date&part=snippet&type=video&maxResults=${maxResults}`)
-                .then(response => response.json())
-                .then(data => {
-                    const videoList = document.getElementById('video-list');
-                    videoList.innerHTML = '<h2>Últimos Videos:</h2>';
+            $.ajax({
+                url: `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&order=date&part=snippet&type=video&maxResults=${maxResults}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    const videoList = $('#video-list');
+                    videoList.empty();
+                    videoList.append('<h2>Últimos Videos:</h2>');
 
-                    data.items.forEach(item => {
+                    $.each(data.items, function(index, item) {
                         const videoId = item.id.videoId;
                         const videoTitle = item.snippet.title;
                         const videoThumbnail = item.snippet.thumbnails.medium.url;
                         const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
-                        const videoListItem = document.createElement('div');
-                        videoListItem.className = 'video-list-item';
-                        videoListItem.innerHTML = `
+                        const videoListItem = $('<div class="video-list-item">');
+                        videoListItem.html(`
                             <img class="video-thumbnail" src="${videoThumbnail}" alt="${videoTitle}">
                             <a href="${videoUrl}" target="_blank">${videoTitle}</a>
-                        `;
-                        videoList.appendChild(videoListItem);
+                        `);
+                        videoList.append(videoListItem);
                     });
 
-                    const channelButton = document.createElement('button');
-                    channelButton.className = 'channel-button';
-                    channelButton.innerHTML = 'Ver Más';
-                    channelButton.onclick = function() {
+                    const channelButton = $('<button class="channel-button">');
+                    channelButton.text('Ver Más');
+                    channelButton.click(function() {
                         window.open(`https://www.youtube.com/channel/${channelId}`, '_blank');
-                    };
+                    });
 
                     // Agregar el logo del canal
-                    const channelLogo = document.createElement('img');
-                    channelLogo.className = 'channel-logo';
-                    channelLogo.src = `https://www.youtube.com/channel/${channelId}/logo`;
+                    const channelLogo = $('<img class="channel-logo">');
+                    channelLogo.attr('src', `https://www.youtube.com/channel/${channelId}/logo`);
                     channelButton.prepend(channelLogo);
 
-                    videoList.appendChild(channelButton);
-                })
-                .catch(error => {
+                    videoList.append(channelButton);
+                },
+                error: function(error) {
                     console.error('Error al cargar los videos:', error);
-                });
+                }
+            });
         }
     </script>
 </body>
