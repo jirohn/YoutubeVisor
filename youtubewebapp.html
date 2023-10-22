@@ -28,10 +28,20 @@
         }
 
         #trending {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
+            display: table;
+            width: 100%;
             margin-top: 20px;
+        }
+
+        .trending-video {
+            display: table-cell;
+            text-align: center;
+            vertical-align: top;
+            width: 16%;
+        }
+
+        .trending-video img {
+            max-width: 100%;
         }
     </style>
 </head>
@@ -77,20 +87,25 @@
 
             // Función para cargar videos en tendencia
             function loadTrendingVideos() {
-                const apiKey = 'AIzaSyA2PYKH6vm6C8gh0o38oRKt5Sd-_ArWtxk'; // Reemplaza con tu clave de API de YouTube
+                const apiKey = 'TU_CLAVE_DE_API'; // Reemplaza con tu clave de API de YouTube
                 const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=12&key=${apiKey}`;
 
-                fetch(apiUrl)
-                    .then(response => response.json())
-                    .then(data => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', apiUrl, true);
+
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
                         trendingContainer.innerHTML = '';
 
-                        data.items.forEach(item => {
+                        const data = JSON.parse(xhr.responseText);
+
+                        data.items.forEach(function(item) {
                             const videoId = item.id;
                             const videoTitle = item.snippet.title;
                             const videoThumbnail = item.snippet.thumbnails.medium.url;
 
                             const videoElement = document.createElement('div');
+                            videoElement.className = 'trending-video';
                             videoElement.innerHTML = `
                                 <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">
                                     <img src="${videoThumbnail}" alt="${videoTitle}">
@@ -100,10 +115,12 @@
 
                             trendingContainer.appendChild(videoElement);
                         });
-                    })
-                    .catch(error => {
-                        console.error('Error al cargar videos en tendencia:', error);
-                    });
+                    } else {
+                        console.error('Error al cargar videos en tendencia:', xhr.status);
+                    }
+                };
+
+                xhr.send();
             }
 
             loadTrendingVideos();
