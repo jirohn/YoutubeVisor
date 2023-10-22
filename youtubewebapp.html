@@ -22,6 +22,14 @@
             height: 400px; /* Ajusta la altura según tus necesidades */
             border: none;
         }
+
+        .video-list {
+            text-align: left;
+        }
+
+        .video-list-item {
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
@@ -33,10 +41,46 @@
 
     <iframe id="channel-frame"></iframe>
 
+    <div class="video-list" id="video-list"></div>
+
     <script>
         function openChannel(url) {
             document.getElementById('channel-frame').src = url;
             document.getElementById('channel-frame').style.display = 'block';
+
+            // Llamada a la API de YouTube para obtener los últimos 3 videos del canal
+            const apiKey = 'AIzaSyA2PYKH6vm6C8gh0o38oRKt5Sd-_ArWtxk';
+            const channelUrl = new URL(url);
+            const channelId = channelUrl.pathname.substring(1);
+
+            fetch(`https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&order=date&part=snippet&type=video&maxResults=3`)
+                .then(response => response.json())
+                .then(data => {
+                    const videoList = document.getElementById('video-list');
+                    videoList.innerHTML = '<h2>Últimos Videos:</h2>';
+
+                    data.items.forEach(item => {
+                        const videoId = item.id.videoId;
+                        const videoTitle = item.snippet.title;
+                        const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+                        const videoListItem = document.createElement('div');
+                        videoListItem.className = 'video-list-item';
+                        videoListItem.innerHTML = `<a href="${videoUrl}" target="_blank">${videoTitle}</a>`;
+                        videoList.appendChild(videoListItem);
+                    });
+
+                    const channelButton = document.createElement('button');
+                    channelButton.className = 'channel-button';
+                    channelButton.innerHTML = 'Ver Más en el Canal';
+                    channelButton.onclick = function() {
+                        window.open(url, '_blank');
+                    };
+                    videoList.appendChild(channelButton);
+                })
+                .catch(error => {
+                    console.error('Error al cargar los videos:', error);
+                });
         }
     </script>
 </body>
